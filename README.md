@@ -1,6 +1,6 @@
 # Personal Expense Tracker
 
-A minimal, clean personal expense tracker built with **vanilla HTML, CSS, and JavaScript** — no build step, no framework. Designed as a mini project for a design studio.
+A minimal, clean personal expense tracker built with **vanilla HTML, CSS, and JavaScript** — no build step, no framework.
 
 ## Features
 

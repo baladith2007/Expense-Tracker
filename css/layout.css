@@ -1,0 +1,234 @@
+/* Header */
+.app-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    background-color: var(--surface);
+    border-bottom: 1px solid var(--border);
+    box-shadow: var(--shadow-sm);
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.header-left,
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.app-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -0.025em;
+}
+
+/* Tabs Navigation */
+.tabs {
+    display: flex;
+    gap: 0.5rem;
+    padding: 0 1.5rem;
+    background-color: var(--surface);
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+    scrollbar-width: thin;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.tabs::-webkit-scrollbar {
+    height: 4px;
+}
+
+.tabs::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.tabs::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 2px;
+}
+
+.tab-btn {
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    font-family: inherit;
+    color: var(--text-muted);
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    white-space: nowrap;
+    margin-bottom: -1px;
+    border-radius: var(--radius) var(--radius) 0 0;
+}
+
+.tab-btn:hover {
+    color: var(--text);
+    background-color: var(--bg);
+}
+
+.tab-btn:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+    border-radius: var(--radius);
+}
+
+.tab-btn.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+}
+
+/* Main Container */
+.container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 1.25rem 1rem;
+}
+
+/* Views */
+.view {
+    display: none;
+    animation: fadeIn 0.3s ease-in;
+}
+
+.view.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 640px) {
+    .app-header {
+        padding: 0.75rem 1rem;
+    }
+    
+    .tabs {
+        padding: 0 1rem;
+    }
+    
+    .container {
+        padding: 1rem;
+    }
+    
+    .card {
+        padding: 1rem;
+    }
+    
+    .summary-value {
+        font-size: 1.5rem;
+    }
+    
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .filters-row {
+        grid-template-columns: 1fr;
+    }
+    
+    .header-right {
+        width: 100%;
+        justify-content: flex-start;
+    }
+
+    .export-import-actions {
+        flex-direction: column;
+    }
+    
+    .fx-row {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* ------------------------------------------------------------------ *
+ * Responsive expenses/recurring tables: switch to stacked cards on
+ * narrow screens so every field (date, merchant, note, actions, …)
+ * is reachable without horizontal scrolling.
+ * ------------------------------------------------------------------ */
+@media (max-width: 700px) {
+    .table-wrapper {
+        overflow-x: visible;
+    }
+
+    .expenses-table,
+    .expenses-table tbody,
+    .expenses-table tr,
+    .expenses-table td {
+        display: block;
+        width: 100%;
+        min-width: 0;
+    }
+
+    .expenses-table thead {
+        display: none;
+    }
+
+    .expenses-table tbody tr {
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        background-color: var(--bg);
+        padding: 0.5rem 0.75rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .expenses-table tbody tr:last-child {
+        margin-bottom: 0;
+    }
+
+    .expenses-table td {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 1rem;
+        padding: 0.3rem 0;
+        border: none;
+        text-align: right;
+        word-break: break-word;
+        font-size: 0.875rem;
+    }
+
+    .expenses-table td::before {
+        content: attr(data-label);
+        flex: 0 0 auto;
+        font-size: 0.7rem;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        text-align: left;
+    }
+
+    .expenses-table td.table-actions {
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: flex-end;
+        gap: 0.5rem;
+        margin-top: 0.4rem;
+        padding-top: 0.6rem;
+        border-top: 1px solid var(--border);
+    }
+
+    .expenses-table td.table-actions::before {
+        display: none;
+    }
+
+    .expenses-table td.table-actions .btn {
+        width: auto;
+    }
+}

@@ -1,0 +1,60 @@
+/* CSS Variables - Light Theme (Minimal & Clean) */
+:root {
+    --bg: #fafafa;
+    --surface: #ffffff;
+    --text: #111111;
+    --text-muted: #6b7280;
+    --text-light: #9ca3af;
+    --border: #e5e7eb;
+    --border-light: #f3f4f6;
+    --accent: #2563eb;
+    --accent-hover: #1d4ed8;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+    --radius: 8px;
+    --radius-lg: 12px;
+}
+
+/* Dark Theme */
+[data-theme="dark"] {
+    --bg: #111827;
+    --surface: #1f2937;
+    --text: #f9fafb;
+    --text-muted: #d1d5db;
+    --text-light: #9ca3af;
+    --border: #374151;
+    --border-light: #1f2937;
+    --accent: #3b82f6;
+    --accent-hover: #2563eb;
+    --success: #10b981;
+    --warning: #f59e0b;
+    --danger: #f87171;
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+    --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.4), 0 1px 2px -1px rgba(0, 0, 0, 0.4);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.4);
+}
+
+/* System Theme - follows prefers-color-scheme */
+@media (prefers-color-scheme: dark) {
+    [data-theme="system"] {
+        --bg: #111827;
+        --surface: #1f2937;
+        --text: #f9fafb;
+        --text-muted: #d1d5db;
+        --text-light: #9ca3af;
+        --border: #374151;
+        --border-light: #1f2937;
+        --accent: #3b82f6;
+        --accent-hover: #2563eb;
+        --success: #10b981;
+        --warning: #f59e0b;
+        --danger: #f87171;
+        --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+        --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.4), 0 1px 2px -1px rgba(0, 0, 0, 0.4);
+        --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.4);
+    }
+}

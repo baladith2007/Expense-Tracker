@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Expense Tracker</title>
+    <link rel="icon" type="image/png" href="assets/icon-192.png">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2563eb">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/themes.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <script src="js/vendor/chart.umd.min.js"></script>
+</head>
+<body>
+    <header class="app-header">
+        <div class="header-left">
+            <h1 class="app-title">Expense Tracker</h1>
+        </div>
+        <div class="header-right">
+            <button id="exportBtn" class="btn btn-secondary" aria-label="Export data">Export</button>
+            <button id="importBtn" class="btn btn-secondary" aria-label="Import data">Import</button>
+            <input type="file" id="importInput" accept="application/json" style="display: none">
+            <button id="themeToggle" class="btn btn-icon" aria-label="Toggle theme">🌙</button>
+        </div>
+    </header>
+
+    <nav class="tabs" role="tablist" aria-label="Main navigation">
+        <button class="tab-btn active" data-view="overview" role="tab" aria-selected="true">Overview</button>
+        <button class="tab-btn" data-view="expenses" role="tab" aria-selected="false">Expenses</button>
+        <button class="tab-btn" data-view="budgets" role="tab" aria-selected="false">Budgets</button>
+        <button class="tab-btn" data-view="recurring" role="tab" aria-selected="false">Recurring</button>
+        <button class="tab-btn" data-view="settings" role="tab" aria-selected="false">Settings</button>
+    </nav>
+
+    <main class="container">
+        <!-- Overview View -->
+        <section id="view-overview" class="view active" role="tabpanel">
+            <div class="summary-cards">
+                <div class="card summary-card">
+                    <h3 class="card-title">Total (Base: <span id="baseCurrencyLabel">USD</span>)</h3>
+                    <div id="totalAmount" class="summary-value">$0.00</div>
+                </div>
+                <div class="card summary-card">
+                    <h3 class="card-title">This Month</h3>
+                    <div id="thisMonthAmount" class="summary-value">$0.00</div>
+                </div>
+                <div class="card summary-card">
+                    <h3 class="card-title">Expense Count</h3>
+                    <div id="expenseCount" class="summary-value">0</div>
+                </div>
+            </div>
+            <div class="charts-row">
+                <div class="card chart-card">
+                    <h3 class="card-title">By Category</h3>
+                    <canvas id="categoryChart" aria-label="Expenses by category chart"></canvas>
+                </div>
+                <div class="card chart-card">
+                    <h3 class="card-title">Monthly Trend</h3>
+                    <canvas id="trendChart" aria-label="Monthly trend chart"></canvas>
+                </div>
+            </div>
+        </section>
+
+        <!-- Expenses View -->
+        <section id="view-expenses" class="view" role="tabpanel" aria-hidden="true">
+            <div class="card">
+                <h2 class="card-title">Add / Edit Expense</h2>
+                <form id="expenseForm" class="expense-form" novalidate>
+                    <input type="hidden" id="expenseId">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="expenseDate">Date</label>
+                            <input type="date" id="expenseDate" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="expenseAmount">Amount</label>
+                            <input type="number" id="expenseAmount" step="0.01" min="0" placeholder="0.00" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="expenseCurrency">Currency</label>
+                            <select id="expenseCurrency"></select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="expenseCategory">Category</label>
+                            <select id="expenseCategory"></select>
+                            <button type="button" id="addCategoryBtn" class="btn btn-small btn-secondary">+ Add Category</button>
+                        </div>
+                        <div class="form-group">
+                            <label for="expenseMerchant">Merchant</label>
+                            <input type="text" id="expenseMerchant" placeholder="e.g. Figma, Groceries">
+                        </div>
+                        <div class="form-group">
+                            <label for="expenseNote">Note</label>
+                            <input type="text" id="expenseNote" placeholder="Optional note">
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary" id="saveExpenseBtn">Save Expense</button>
+                        <button type="button" class="btn btn-secondary" id="cancelEditBtn" style="display:none">Cancel Edit</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="card">
+                <h2 class="card-title">Filters</h2>
+                <div class="filters-row">
+                    <div class="form-group">
+                        <label for="filterStartDate">Start Date</label>
+                        <input type="date" id="filterStartDate">
+                    </div>
+                    <div class="form-group">
+                        <label for="filterEndDate">End Date</label>
+                        <input type="date" id="filterEndDate">
+                    </div>
+                    <div class="form-group">
+                        <label for="filterCategory">Category</label>
+                        <select id="filterCategory">
+                            <option value="all">All</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="filterSearch">Search</label>
+                        <input type="text" id="filterSearch" placeholder="Merchant or note">
+                    </div>
+                    <div class="form-group">
+                        <label for="filterSort">Sort By</label>
+                        <select id="filterSort">
+                            <option value="date-desc">Date (Newest)</option>
+                            <option value="date-asc">Date (Oldest)</option>
+                            <option value="amount-desc">Amount (High-Low)</option>
+                            <option value="amount-asc">Amount (Low-High)</option>
+                        </select>
+                    </div>
+                </div>
+                <button type="button" id="clearFiltersBtn" class="btn btn-secondary">Clear Filters</button>
+            </div>
+
+            <div class="card">
+                <h2 class="card-title">Expenses List</h2>
+                <div class="table-wrapper">
+                    <table class="expenses-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Merchant</th>
+                                <th>Category</th>
+                                <th>Amount</th>
+                                <th>Currency</th>
+                                <th>Note</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="expensesTableBody"></tbody>
+                    </table>
+                </div>
+                <div id="noExpenses" class="empty-state" style="display:none">No expenses found.</div>
+            </div>
+        </section>
+
+        <!-- Budgets View -->
+        <section id="view-budgets" class="view" role="tabpanel" aria-hidden="true">
+            <div class="card">
+                <h2 class="card-title">Set Budget per Category</h2>
+                <form id="budgetForm" class="budget-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="budgetCategory">Category</label>
+                            <select id="budgetCategory"></select>
+                        </div>
+                        <div class="form-group">
+                            <label for="budgetAmount">Budget Amount (Base)</label>
+                            <input type="number" id="budgetAmount" step="0.01" min="0" placeholder="0.00">
+                        </div>
+                        <div class="form-group">
+                            <label for="budgetPeriod">Period</label>
+                            <select id="budgetPeriod">
+                                <option value="monthly" selected>Monthly</option>
+                            </select>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save Budget</button>
+                </form>
+            </div>
+
+            <div class="card">
+                <h2 class="card-title">Budget Progress</h2>
+                <div id="budgetList" class="budget-list"></div>
+                <div id="noBudgets" class="empty-state" style="display:none">No budgets set yet.</div>
+            </div>
+        </section>
+
+        <!-- Recurring View -->
+        <section id="view-recurring" class="view" role="tabpanel" aria-hidden="true">
+            <div class="card">
+                <h2 class="card-title">Add Recurring Expense</h2>
+                <form id="recurringForm" class="recurring-form">
+                    <input type="hidden" id="recurringId">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="recurringMerchant">Merchant</label>
+                            <input type="text" id="recurringMerchant" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="recurringAmount">Amount</label>
+                            <input type="number" id="recurringAmount" step="0.01" min="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="recurringCurrency">Currency</label>
+                            <select id="recurringCurrency"></select>
+                        </div>
+                        <div class="form-group">
+                            <label for="recurringCategory">Category</label>
+                            <select id="recurringCategory"></select>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="recurringFrequency">Frequency</label>
+                            <select id="recurringFrequency">
+                                <option value="daily">Daily</option>
+                                <option value="weekly">Weekly</option>
+                                <option value="monthly" selected>Monthly</option>
+                                <option value="yearly">Yearly</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="recurringInterval">Interval</label>
+                            <input type="number" id="recurringInterval" value="1" min="1" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="recurringNextDue">Next Due Date</label>
+                            <input type="date" id="recurringNextDue" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="recurringNote">Note</label>
+                            <input type="text" id="recurringNote" placeholder="Optional">
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">Save Recurring</button>
+                        <button type="button" id="cancelRecurringBtn" class="btn btn-secondary" style="display:none">Cancel Edit</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="card">
+                <h2 class="card-title">Recurring Expenses</h2>
+                <div class="table-wrapper">
+                    <table class="expenses-table">
+                        <thead>
+                            <tr>
+                                <th>Merchant</th>
+                                <th>Amount</th>
+                                <th>Currency</th>
+                                <th>Category</th>
+                                <th>Frequency</th>
+                                <th>Next Due</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recurringTableBody"></tbody>
+                    </table>
+                </div>
+                <div id="noRecurring" class="empty-state" style="display:none">No recurring expenses.</div>
+            </div>
+        </section>
+
+        <!-- Settings View -->
+        <section id="view-settings" class="view" role="tabpanel" aria-hidden="true">
+            <div class="card">
+                <h2 class="card-title">General Settings</h2>
+                <form id="settingsForm" class="settings-form">
+                    <div class="form-group">
+                        <label for="baseCurrency">Base Currency</label>
+                        <select id="baseCurrency"></select>
+                    </div>
+                    <div class="form-group">
+                        <label for="themeSelect">Theme</label>
+                        <select id="themeSelect">
+                            <option value="light">Light</option>
+                            <option value="dark">Dark</option>
+                            <option value="system">System</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save Settings</button>
+                </form>
+            </div>
+
+            <div class="card">
+                <h2 class="card-title">FX Rates (Base Currency Conversion)</h2>
+                <p class="card-subtitle">Enter rates relative to your base currency.</p>
+                <form id="fxForm" class="fx-form">
+                    <div id="fxRows" class="fx-rows"></div>
+                    <button type="submit" class="btn btn-primary">Save FX Rates</button>
+                </form>
+            </div>
+
+            <div class="card">
+                <h2 class="card-title">CSV Export/Import</h2>
+                <div class="export-import-actions">
+                    <button id="exportJsonBtn" class="btn btn-secondary">Export Full JSON</button>
+                    <button id="exportCsvBtn" class="btn btn-secondary">Export Expenses CSV</button>
+                </div>
+                <p class="card-subtitle">Import accepts full JSON export.</p>
+            </div>
+        </section>
+    </main>
+
+    <div id="toast" class="toast" role="status" aria-live="polite" aria-hidden="true"></div>
+
+    <script type="module" src="js/app.js"></script>
+</body>
+</html>
